@@ -1,16 +1,63 @@
-import { useState } from "react";
+/* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
 import styles from "./SearchPostcode.module.scss";
-function SearchPostcode() {
+import {
+  getPostcodeFromSuburb,
+  getSuburbFromPostcode,
+} from "../../services/postcodeService";
+
+function SearchPostcode({ showSearchResult }) {
   const [searchTerm, setSearchTerm] = useState(null);
+  //const [postcode, setPostcode] = useState([]);
   const [searchCategory, setSearchCategory] = useState(null);
+  // const [error, setError] = useState(null);
 
   const formOnSubmit = (e) => {
     e.preventDefault();
-    console.log(e.target[0].value);
-    console.log(e.target[2].value);
-    setSearchTerm(e.target[0].value);
+    const inputText = e.target[0].value;
+    setSearchTerm(inputText);
+    e.target[0].value = "";
     setSearchCategory(e.target[2].value);
   };
+
+  useEffect(() => {
+    // if (searchCategory === "postcode" && typeof searchTerm != "number") {
+    //   console.log("wrong search term");
+    //   showSearchResult({
+    //     status: "400",
+    //     message: "Please enter valid postcode",
+    //   });
+    //   return;
+    // }
+
+    if (searchTerm != null) {
+      console.log("search term is: ", searchTerm);
+      switch (searchCategory) {
+        case "postcode":
+          searchByPostcode();
+          break;
+        case "suburb":
+          searchBySuburb();
+          break;
+      }
+    }
+  }, [searchTerm]);
+
+  const searchByPostcode = async () => {
+    const results = await getSuburbFromPostcode(searchTerm);
+    console.log("in search func. results= ", results);
+    //setPostcode(results);
+    showSearchResult(results);
+  };
+
+  const searchBySuburb = async () => {
+    console.log("search by suburb ", searchTerm);
+    const results = await getPostcodeFromSuburb(searchTerm);
+
+    showSearchResult(results);
+    console.log("search by suburb");
+  };
+
   return (
     <div>
       <form className={styles.form} onSubmit={formOnSubmit}>
@@ -25,6 +72,8 @@ function SearchPostcode() {
           </select>
         </div>
       </form>
+
+      {/* {error && <div>{error}</div>} */}
     </div>
   );
 }
