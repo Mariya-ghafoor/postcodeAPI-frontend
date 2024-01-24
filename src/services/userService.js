@@ -8,6 +8,7 @@ export const registerUser = async (newUserData) => {
     headers: {
       "Content-Type": "application/json",
     },
+    //credentials: "same-origin",
     body: JSON.stringify(newUserData),
   });
 
@@ -15,17 +16,16 @@ export const registerUser = async (newUserData) => {
 };
 
 export const login = async (userData) => {
-  const cookies = new Cookies();
-  //const token = await cookies.get("access_token");
-  console.log("token: ", cookies);
   const response = await fetch("http://localhost:3306/auth/login", {
     method: "POST",
     headers: {
+      Accept: "application/json",
       "Content-type": "application/json",
-      // Authorization: `Bearer ${token}`, // notice the Bearer before your token
-      // Authorization: `${token}`,
     },
+    //mode: "no-cors", // 'cors' by default
+    credentials: "same-origin",
+    // withCredentials: true,
     body: JSON.stringify(userData),
   });
-  return await response.json();
+  return response.json();
 };

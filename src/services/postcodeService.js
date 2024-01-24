@@ -1,3 +1,4 @@
+import Cookies from "universal-cookie";
 // Get list of all postcodes
 
 export const getAllPostcodes = async () => {
@@ -64,8 +65,17 @@ export const getPostcodeFromSuburb = async (suburb) => {
 };
 
 // create a new postcode
-// export const addNewPostcode = async (postcode) => {
-//   const response = await fetch("http://localhost:3306/postcodes");
-//   const data = await response.json();
-//   return data;
-// };
+export const addNewPostcode = async (postcode) => {
+  const cookies = new Cookies();
+  const token = await cookies.get("access_token");
+
+  const response = await fetch("http://localhost:3306/postcodes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(postcode),
+  });
+  return response.json();
+};

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import * as yup from "yup";
+import { addNewPostcode } from "../../services/postcodeService";
 
 function AddPostcode() {
   const [errors, setErrors] = useState({
@@ -29,6 +30,7 @@ function AddPostcode() {
       .validate(formData, { abortEarly: false })
       .then((formData) => {
         console.log("form data: ", formData);
+        addPostcode(formData);
       })
       .catch(function (err) {
         err.inner.forEach((e) => {
@@ -43,8 +45,15 @@ function AddPostcode() {
         });
       });
   };
+
+  const addPostcode = (formData) => {
+    addNewPostcode(formData).then((response) =>
+      console.log("After adding new postcode ", response)
+    );
+  };
   return (
     <div>
+      <h2>Add a new Postcode</h2>
       <form onSubmit={onFormSubmit}>
         <div>
           <label>Postcode</label>

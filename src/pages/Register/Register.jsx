@@ -1,7 +1,8 @@
 import * as yup from "yup";
-import { useState } from "react";
-import { registerUser } from "../../services/userService";
+import { useContext, useState } from "react";
+import { login, registerUser } from "../../services/userService";
 import Cookies from "universal-cookie";
+import { JwtContext } from "../../context/JwtContextProvider/JwtContextProvider";
 
 function Register() {
   const [errors, setErrors] = useState({
@@ -9,6 +10,8 @@ function Register() {
     email: null,
     password: null,
   });
+
+  const { jwt, setJwt } = useContext(JwtContext);
 
   const [accessToken, setAccessToken] = new useState(null);
 
@@ -52,21 +55,26 @@ function Register() {
       });
   };
 
-  const registerNewUser = async (formData) => {
-    const cookies = new Cookies();
-    const response = await registerUser(formData);
-    console.log("response receieved: ", response);
-    const accessToken = await response.token;
-    console.log("Token: ", accessToken);
-    if (accessToken) {
-      cookies.set("access_token", accessToken, {
-        path: "/",
-        httpOnly: true,
-        secure: true,
-      });
-      setAccessToken((oldToken) => (oldToken = cookies.getAll));
-      console.log("Access token", accessToken);
-    }
+  const registerNewUser = (formData) => {
+    // const cookies = new Cookies();
+    //CHANGE TO REGISTER
+    //const response = await login(formData);
+    registerUser(formData)
+      .then((response) => {
+        console.log("reponse: ", response);
+
+        const cookies = new Cookies();
+        if (response) {
+          cookies.set("access_token", response.token, {
+            path: "/",
+            // httpOnly: true,
+            // secure: true,
+            //expires: new Date(Date.now()),
+          });
+        }
+        console.log("cookies: ", cookies.get("access_token"));
+      })
+      .catch((err) => console.log("error: ", err));
   };
 
   return (
@@ -93,7 +101,7 @@ function Register() {
 
         <button>Submit</button>
       </form>
-      {accessToken && (
+      {jwt && (
         <div>
           You have registered successfully! Add a new postcode{" "}
           <a href="/add_postcode">here</a>
