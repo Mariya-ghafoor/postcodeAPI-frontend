@@ -1,6 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const onLoginClick = () => {
+    navigate("/login");
+  };
   const onLogoutClick = () => {
     const cookies = new Cookies();
     const currentDate = new Date(Date.now());
@@ -14,7 +19,7 @@ const Navbar = () => {
   };
   return (
     <div>
-      <button>Login</button>
+      <button onClick={onLoginClick}>Login</button>
       <button onClick={onLogoutClick}>Logout</button>
     </div>
   );

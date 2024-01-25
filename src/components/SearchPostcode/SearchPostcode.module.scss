@@ -4,4 +4,45 @@
   gap: 20px;
   justify-content: center;
   align-items: center;
+  //width: 50vw;
+}
+
+.search__buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.inputField {
+  width: 100%;
+  height: 3rem;
+  font-size: 1rem;
+  border: 2px solid #1a1a1a;
+  border-radius: 15px;
+}
+
+.dropdown {
+  height: 60px;
+  border: 2px solid #1a1a1a;
+  border-radius: 15px;
+  padding: 16px 24px;
+  font-family: Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 16px;
+  font-weight: 600;
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+    transform: translateY(-2px);
+    background-color: green;
+    color: white;
+  }
+}
+
+.button {
+  width: 200px;
 }

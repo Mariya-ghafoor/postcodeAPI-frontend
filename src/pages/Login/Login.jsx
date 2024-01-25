@@ -1,29 +1,25 @@
 import * as yup from "yup";
 import { useContext, useState } from "react";
 import { login, registerUser } from "../../services/userService";
-import styles from "./Register.module.scss";
 import Cookies from "universal-cookie";
-import { JwtContext } from "../../context/JwtContextProvider/JwtContextProvider";
-import { useNavigate } from "react-router-dom";
+import styles from "./Login.module.scss";
+import { motion } from "framer-motion";
 
-function Register() {
-  const [registerSuccess, setRegisterSuccess] = useState(false);
+function Login() {
   const [errors, setErrors] = useState({
     username: null,
-    email: null,
     password: null,
   });
 
-  const { jwt, setJwt } = useContext(JwtContext);
+  const [accessToken, setAccessToken] = new useState(null);
 
-  const navigate = useNavigate();
+  const divVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 1, delay: 0.5 } },
+  };
 
   const schema = yup.object({
     username: yup.string().required("Please enter a username"),
-    email: yup
-      .string()
-      .required("Email is required")
-      .email("Email must be a valid email address"),
     password: yup
       .string()
       .required("Please enter a password")
@@ -34,7 +30,6 @@ function Register() {
     e.preventDefault();
     const formData = {
       username: e.target.username.value,
-      email: e.target.email.value,
       password: e.target.password.value,
     };
     console.log(formData);
@@ -42,7 +37,7 @@ function Register() {
     schema
       .validate(formData, { abortEarly: false })
       .then((formData) => {
-        registerNewUser(formData);
+        loginUser(formData);
       })
       .catch(function (err) {
         err.inner.forEach((e) => {
@@ -58,16 +53,10 @@ function Register() {
       });
   };
 
-  const redirectToAddPostcode = () => {
-    setTimeout(() => {
-      if (registerSuccess) navigate("/add_postcode");
-    }, 2000);
-  };
-
-  const registerNewUser = (formData) => {
-    registerUser(formData)
+  const loginUser = (formData) => {
+    login(formData)
       .then((response) => {
-        console.log("reponse: ", response.token);
+        console.log("reponse: ", response);
 
         const cookies = new Cookies();
         if (response) {
@@ -79,54 +68,50 @@ function Register() {
           });
         }
         console.log("cookies: ", cookies.get("access_token"));
-        if (cookies.get("access_token")) {
-          setRegisterSuccess(true);
-          redirectToAddPostcode();
-        }
+        setAccessToken(cookies.get("access_token"));
       })
       .catch((err) => console.log("error: ", err));
   };
 
   return (
-    <div className={styles.main}>
-      <h2>Register to add new postcodes</h2>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={divVariants}
+      className={styles.main}
+    >
+      <h2>Login to add new postcodes</h2>
       <form className={styles.form} onSubmit={handleSubmit}>
-        <div className={styles.form__field}>
-          <label className={styles.label}>Username</label>
-          <input className={styles.input__field} type="text" name="username" />
+        <div>
+          <label>Username</label>
+          <input type="text" className={styles.input__field} name="username" />
+          {errors.username && (
+            <p className={styles.errors}>{errors.username}</p>
+          )}
         </div>
-        {errors.username && <p className={styles.errors}>{errors.username}</p>}
 
-        <div className={styles.form__field}>
-          <label className={styles.label}>Email</label>
-          <input className={styles.input__field} type="email" name="email" />
-        </div>
-        {errors.email && <p className={styles.errors}>{errors.email}</p>}
-
-        <div className={styles.form__field}>
-          <label className={styles.label}>Password</label>
+        <div>
+          <label>Password</label>
           <input
-            className={styles.input__field}
             type="password"
+            className={styles.input__field}
             name="password"
           />
+          {errors.password && (
+            <p className={styles.errors}>{errors.password}</p>
+          )}
         </div>
-        {errors.password && <p className={styles.errors}>{errors.password}</p>}
 
         <button className={styles.submit__button}>Submit</button>
       </form>
-      {jwt && (
+      {accessToken && (
         <div>
           You have registered successfully! Add a new postcode{" "}
           <a href="/add_postcode">here</a>
         </div>
       )}
-
-      {registerSuccess && (
-        <p>You have registered successfully. Redirecting to postcode page</p>
-      )}
-    </div>
+    </motion.div>
   );
 }
 
-export default Register;
+export default Login;

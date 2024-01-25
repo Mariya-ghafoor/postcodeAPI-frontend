@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as yup from "yup";
 import { addNewPostcode } from "../../services/postcodeService";
+import styles from "./AddPostcode.module.scss";
 
 function AddPostcode() {
   const [errors, setErrors] = useState({
     postcode: null,
     suburb: null,
   });
+
+  const [postcodeSuccess, setPostcodeSuccess] = useState(false);
 
   const schema = yup.object({
     postcode: yup
@@ -31,6 +34,7 @@ function AddPostcode() {
       .then((formData) => {
         console.log("form data: ", formData);
         addPostcode(formData);
+        setPostcodeSuccess(true);
       })
       .catch(function (err) {
         err.inner.forEach((e) => {
@@ -52,22 +56,22 @@ function AddPostcode() {
     );
   };
   return (
-    <div>
+    <div className={styles.main}>
       <h2>Add a new Postcode</h2>
-      <form onSubmit={onFormSubmit}>
-        <div>
-          <label>Postcode</label>
-          <input type="text" name="postcode" />
+      <form className={styles.form} onSubmit={onFormSubmit}>
+        <div className={styles.form__field}>
+          <label className={styles.label}>Postcode</label>
+          <input className={styles.input__field} type="text" name="postcode" />
           {errors.postcode && <p>{errors.postcode}</p>}
         </div>
 
-        <div>
-          <label>Suburb</label>
-          <input type="text" name="suburb" />
+        <div className={styles.form__field}>
+          <label className={styles.label}>Suburb</label>
+          <input className={styles.input__field} type="text" name="suburb" />
           {errors.suburb && <p>{errors.suburb}</p>}
         </div>
 
-        <button>Submit</button>
+        <button className={styles.submit__button}>Submit</button>
       </form>
     </div>
   );

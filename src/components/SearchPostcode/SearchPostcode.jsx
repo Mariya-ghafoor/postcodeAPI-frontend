@@ -5,31 +5,32 @@ import {
   getPostcodeFromSuburb,
   getSuburbFromPostcode,
 } from "../../services/postcodeService";
+import { motion } from "framer-motion";
 
-function SearchPostcode({ showSearchResult }) {
+function SearchPostcode() {
   const [searchTerm, setSearchTerm] = useState(null);
-  //const [postcode, setPostcode] = useState([]);
   const [searchCategory, setSearchCategory] = useState(null);
-  // const [error, setError] = useState(null);
+  const [searchResult, setSearchResult] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [postcodes, setPostcodes] = useState([]);
+
+  const tableVariants = {
+    hidden: { opacity: 0, height: 0 },
+    visible: { opacity: 1, height: "auto", transition: { duration: 0.5 } },
+  };
 
   const formOnSubmit = (e) => {
     e.preventDefault();
-    const inputText = e.target[0].value;
+    // const inputText = e.target[0].value;
+    const inputText = e.target.inputText.value;
     setSearchTerm(inputText);
-    e.target[0].value = "";
-    setSearchCategory(e.target[2].value);
+    //e.target[0].value = "";
+    e.target.inputText.value = "";
+    // setSearchCategory(e.target[2].value);
+    setSearchCategory(e.target.searchCategory.value);
   };
 
   useEffect(() => {
-    // if (searchCategory === "postcode" && typeof searchTerm != "number") {
-    //   console.log("wrong search term");
-    //   showSearchResult({
-    //     status: "400",
-    //     message: "Please enter valid postcode",
-    //   });
-    //   return;
-    // }
-
     if (searchTerm != null) {
       console.log("search term is: ", searchTerm);
       switch (searchCategory) {
@@ -58,23 +59,75 @@ function SearchPostcode({ showSearchResult }) {
     console.log("search by suburb");
   };
 
+  const showSearchResult = (postcode) => {
+    console.log("in home func ", postcode);
+    if (postcode.status === "404") {
+      console.log("caught error 404");
+      setPostcodes([]);
+      setErrorMessage(() => postcode.message);
+      console.log("error is ", errorMessage);
+    } else if (postcode.status === "400") {
+      console.log("caught error 400");
+      setPostcodes([]);
+      setErrorMessage(() => postcode.message);
+      console.log("error is ", errorMessage);
+    } else {
+      setErrorMessage(null);
+      setSearchResult(postcode);
+    }
+  };
+
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={tableVariants}>
       <form className={styles.form} onSubmit={formOnSubmit}>
-        <div>
-          <input type="text" />
-          <button>Search</button>
-        </div>
-        <div>
-          <select defaultValue="postcode">
-            <option value="postcode">Search by postcode</option>
-            <option value="suburb">Search by suburb</option>
-          </select>
+        <input className={styles.inputField} type="text" name="inputText" />
+        <div className={styles.search__buttons}>
+          <div>
+            <select
+              className={styles.dropdown}
+              defaultValue="postcode"
+              name="searchCategory"
+            >
+              <option value="postcode">Search by postcode</option>
+              <option value="suburb">Search by suburb</option>
+            </select>
+          </div>
+          <div className={styles.button}>
+            <button>Search</button>
+          </div>
         </div>
       </form>
 
-      {/* {error && <div>{error}</div>} */}
-    </div>
+      {searchResult && (
+        <motion.table
+          initial="hidden"
+          animate="visible"
+          variants={tableVariants}
+        >
+          <tbody>
+            <tr>
+              <th>Sr.no.</th>
+              <th>Postcode</th>
+              <th>Suburb</th>
+            </tr>
+
+            <tr key={searchResult.id}>
+              <td>{searchResult.id}</td>
+              <td>{searchResult.postcode}</td>
+              <td>{searchResult.suburb}</td>
+            </tr>
+          </tbody>
+        </motion.table>
+      )}
+      {errorMessage && <div>{errorMessage}</div>}
+
+      {errorMessage && <div>{errorMessage}</div> && (
+        <p>
+          Postcode missing? <a href="">Sign in</a> or{" "}
+          <a href="/register">Register</a> to add to the list
+        </p>
+      )}
+    </motion.div>
   );
 }
 

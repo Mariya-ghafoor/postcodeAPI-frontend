@@ -12,6 +12,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  font-size: 2rem;
 }
 
 .see__all {
@@ -42,4 +43,16 @@ tr {
 
 tr:nth-child(even) {
   background-color: #88828290;
+}
+
+.button__options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  // flex-direction: column;
+}
+
+.button__home {
+  width: 200px;
 }
