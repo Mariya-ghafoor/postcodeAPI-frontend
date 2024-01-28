@@ -12,7 +12,15 @@ export const registerUser = async (newUserData) => {
     body: JSON.stringify(newUserData),
   });
 
-  return response.json();
+  if (response.status == 400 || response.status == 500) {
+    const error = {
+      status: "400",
+      message: "User already exists",
+    };
+    return error;
+  }
+
+  return response;
 };
 
 export const login = async (userData) => {
@@ -27,5 +35,22 @@ export const login = async (userData) => {
     // withCredentials: true,
     body: JSON.stringify(userData),
   });
-  return response.json();
+
+  if (response.status == 400) {
+    const error = {
+      status: "400",
+      message: "Either User does not exist or password is wrong",
+    };
+    return error;
+  }
+
+  if (response.status == 500) {
+    const error = {
+      status: "500",
+      message: "An error occured. Please try again",
+    };
+    return error;
+  }
+
+  return response;
 };

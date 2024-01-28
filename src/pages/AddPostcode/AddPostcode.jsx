@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import * as yup from "yup";
 import { addNewPostcode } from "../../services/postcodeService";
 import styles from "./AddPostcode.module.scss";
+import { motion } from "framer-motion";
 
 function AddPostcode() {
   const [errors, setErrors] = useState({
@@ -10,6 +11,12 @@ function AddPostcode() {
   });
 
   const [postcodeSuccess, setPostcodeSuccess] = useState(false);
+  const [serverError, setServerError] = useState(null);
+
+  const divVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 1, delay: 0.5 } },
+  };
 
   const schema = yup.object({
     postcode: yup
@@ -51,12 +58,26 @@ function AddPostcode() {
   };
 
   const addPostcode = (formData) => {
-    addNewPostcode(formData).then((response) =>
-      console.log("After adding new postcode ", response)
-    );
+    addNewPostcode(formData)
+      .then((response) => {
+        if (response.ok) {
+          console.log("reponse is ok: ", response);
+          setServerError(null);
+          setPostcodeSuccess(true);
+        } else {
+          setPostcodeSuccess(null);
+          setServerError(response.message);
+        }
+      })
+      .catch((e) => console.log("An error occured, ", e));
   };
   return (
-    <div className={styles.main}>
+    <motion.div
+      className={styles.main}
+      initial="hidden"
+      animate="visible"
+      variants={divVariants}
+    >
       <h2>Add a new Postcode</h2>
       <form className={styles.form} onSubmit={onFormSubmit}>
         <div className={styles.form__field}>
@@ -73,7 +94,9 @@ function AddPostcode() {
 
         <button className={styles.submit__button}>Submit</button>
       </form>
-    </div>
+      {postcodeSuccess === true && <p>Postcode added successfully</p>}
+      {serverError && <p>{serverError}</p>}
+    </motion.div>
   );
 }
 

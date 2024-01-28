@@ -3,10 +3,11 @@ import { useContext, useState } from "react";
 import { login, registerUser } from "../../services/userService";
 import styles from "./Register.module.scss";
 import Cookies from "universal-cookie";
-import { JwtContext } from "../../context/JwtContextProvider/JwtContextProvider";
 import { useNavigate } from "react-router-dom";
+import { UserLoginContext } from "../../context/UserLoginContextProvider/UserLoginContextProvider";
 
 function Register() {
+  const { setIsLoggedIn } = useContext(UserLoginContext);
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [errors, setErrors] = useState({
     username: null,
@@ -14,7 +15,8 @@ function Register() {
     password: null,
   });
 
-  const { jwt, setJwt } = useContext(JwtContext);
+  const [serverError, setServerError] = new useState(null);
+  const [loginSuccess, setLoginSuccess] = new useState(false);
 
   const navigate = useNavigate();
 
@@ -59,12 +61,40 @@ function Register() {
   };
 
   const redirectToAddPostcode = () => {
+    console.log("redirecting");
     setTimeout(() => {
-      if (registerSuccess) navigate("/add_postcode");
+      if (loginSuccess) navigate("/add_postcode");
     }, 2000);
   };
 
   const registerNewUser = (formData) => {
+    registerUser(formData)
+      .then((response) => {
+        if (response.ok) {
+          console.log("response is ok");
+          return response.json();
+        } else {
+          setLoginSuccess(false);
+          setServerError(response.message);
+        }
+      })
+      .then((data) => {
+        const cookies = new Cookies();
+        console.log("response ", data);
+        cookies.set("access_token", data.token, {
+          path: "/",
+          // httpOnly: true,
+          // secure: true,
+          //expires: new Date(Date.now()),
+        });
+        setServerError(null);
+        setLoginSuccess(true);
+        setIsLoggedIn(true);
+        redirectToAddPostcode();
+      });
+  };
+
+  const registerNewUser1 = (formData) => {
     registerUser(formData)
       .then((response) => {
         console.log("reponse: ", response.token);
@@ -115,16 +145,12 @@ function Register() {
 
         <button className={styles.submit__button}>Submit</button>
       </form>
-      {jwt && (
+      {loginSuccess === true && (
         <div>
-          You have registered successfully! Add a new postcode{" "}
-          <a href="/add_postcode">here</a>
+          You have registered successfully! Redirecting to postcode page
         </div>
       )}
-
-      {registerSuccess && (
-        <p>You have registered successfully. Redirecting to postcode page</p>
-      )}
+      {serverError && <p className={styles.errors}>{serverError}</p>}
     </div>
   );
 }

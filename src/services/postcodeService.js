@@ -68,6 +68,7 @@ export const getPostcodeFromSuburb = async (suburb) => {
 export const addNewPostcode = async (postcode) => {
   const cookies = new Cookies();
   const token = await cookies.get("access_token");
+  console.log("Got cookies: ", token);
 
   const response = await fetch("http://localhost:3306/postcodes", {
     method: "POST",
@@ -75,7 +76,25 @@ export const addNewPostcode = async (postcode) => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    //credentials: "same-origin",
+    //withCredentials: true,
     body: JSON.stringify(postcode),
   });
-  return response.json();
+  console.log("response: ", response);
+
+  if (response.status == 409) {
+    const error = {
+      status: "409",
+      message: `Postcode already exists`,
+    };
+    return error;
+  }
+  if (response.status == 500) {
+    const error = {
+      status: "500",
+      message: "An error occured. Please try again",
+    };
+    return error;
+  }
+  return response;
 };

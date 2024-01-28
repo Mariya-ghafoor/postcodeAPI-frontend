@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import ViewPostcodes from "../../components/ViewPostcodes/ViewPostcodes";
 import Auth from "../../components/Auth/Auth";
+import { motion } from "framer-motion";
 
 function Home() {
   const [postcodes, setPostcodes] = useState([]);
@@ -14,8 +15,18 @@ function Home() {
     visible: { opacity: 1, height: "auto", transition: { duration: 0.5 } },
   };
 
+  const divVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 1, delay: 0.5 } },
+  };
+
   return (
-    <div className={styles.main}>
+    <motion.div
+      className={styles.main}
+      initial="hidden"
+      animate="visible"
+      variants={divVariants}
+    >
       <div className={styles.heading}>
         <h1>Postcode API</h1>
         <div className={styles.button__options}>
@@ -52,7 +63,7 @@ function Home() {
       {showSection === "view" && <ViewPostcodes />}
 
       {showSection === "add" && <Auth />}
-    </div>
+    </motion.div>
   );
 }
 
