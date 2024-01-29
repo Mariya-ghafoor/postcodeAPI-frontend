@@ -63,7 +63,7 @@ function Register() {
   const redirectToAddPostcode = () => {
     console.log("redirecting");
     setTimeout(() => {
-      if (loginSuccess) navigate("/add_postcode");
+      navigate("/add_postcode");
     }, 2000);
   };
 
