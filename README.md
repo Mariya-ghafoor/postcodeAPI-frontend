@@ -1,4 +1,5 @@
 # POST CODE REST API (REACT FRONTEND)
+[screen-capture (6).webm](https://github.com/Mariya-ghafoor/postcodeAPI-frontend/assets/126770566/8277f2ff-639a-46de-aa44-9ee08f43a611)
 
 - This is the frontend of Postcode API that utilizes Spring security to securely retrieve and add new postcodes to the database.
 - Postcode API backend: https://github.com/Mariya-ghafoor/postcodeAPI-backend
